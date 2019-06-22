@@ -113,3 +113,10 @@ friends: [
         href: "https://www.chongbuluo.com/"
     }
 ]
+
+
+# For Jekyll >= 3.5.0
+# This will enable each of these plugins automatically.
+plugins:
+  - jekyll-paginate
+  - jemoji
