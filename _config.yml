@@ -40,9 +40,13 @@ anchorjs: true                          # if you want to customize anchor. check
 # Gems
 # from PR#40, to support local preview for Jekyll 3.0
 gems: [jekyll-paginate]
-gems: ["emoji_for_jekyll"]
-gem 'jemoji'
-gems: [jekyll-paginate, jemoji]
+
+
+
+
+# Gems
+# from PR#40, to support local preview for Jekyll 3.0
+plugins: [jekyll-paginate, jemoji]
 
 
 
@@ -116,10 +120,3 @@ friends: [
         href: "https://www.chongbuluo.com/"
     }
 ]
-
-
-# For Jekyll >= 3.5.0
-# This will enable each of these plugins automatically.
-plugins:
-  - jekyll-paginate
-  - jemoji
