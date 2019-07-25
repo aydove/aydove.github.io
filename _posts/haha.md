@@ -1,0 +1,135 @@
+### 最小的k个数
+
+输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
+
+#### 方法1：（[here~](https://blog.csdn.net/shakespeare001/article/details/51280814)）[](https://aydove.github.io/2019/04/23/40-%E6%9C%80%E5%B0%8F%E7%9A%84k%E4%B8%AA%E6%95%B0/#%E6%96%B9%E6%B3%951here)
+
+可以先创建一个大小为k的数据容器来存储最小的k个数字，从输入的n个整数中一个一个读入放入该容器中，
+
+-   如果容器中的数字少于k个，按题目要求直接返回空；
+-   如果容器中已有k个数字，而数组中还有值未加入，此时就不能直接插入了，而需要替换容器中的值。
+
+按以下步骤进行插入： 1 先找到容器中的最大值； 2 将待查入值和最大值比较，如果待查入值大于容器中的最大值，则直接舍弃这个待查入值即可；如果待查入值小于容器中的最小值，则用这个待查入值替换掉容器中的最大值； 3 重复上述步骤，容器中最后就是整个数组的最小k个数字。
+
+[click here~](https://yongyuan.name/blog/find-the-smallest-k-numbers.html)  上面每次都需要找到k个整数中的最大数，所以可以采用最大堆。同时还可以用红黑树来实现上述容器，在STL中set,map,multiset,multimap都是基于红黑树(RB-tree)实现的(顺便补充：hashmap,hashset,hashmultiset,hashmultimap是基于hash table)。所以可以采用STL中的multiset来作为该数据容器。
+
+关于set和multiset的区别及用法，[STL之五：set/multiset用法详解](http://blog.csdn.net/longshengguoji/article/details/8546286)这篇文章总结得很不错。下面这张图很清楚的给出了set和multiset的区别：
+
+> set、multiset都是集合类，差别在与set中不允许有重复元素，multiset中允许有重复元素。这两个类有很多现成的函数可以用。详情可以参考：[https://zh.cppreference.com/w/cpp/container/multiset](https://zh.cppreference.com/w/cpp/container/multiset)
+
+```objk
+class Solution {
+public:
+    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+        if(input.size() <= 0 || input.size() < k) 
+            return vector<int> ();
+         
+        multiset<int, greater<int> > leastNums;//1 创建一个红黑树：greater<int>：内置类型从大到小  
+        
+        vector<int>::iterator iter = input.begin();//2 创建一个input的迭代器  
+        
+        for(; iter != input.end(); iter++) {// 3循环input  
+        
+            if(leastNums.size() < k)//3.1对于前k个  
+            
+                leastNums.insert(*iter);
+            else {//3.2对于后面的几个  
+            
+                multiset<int, greater<int> >::iterator iterGreatest = leastNums.begin();//3.2.1创建一个红黑树的迭代器  
+                
+                if(*iter < *(leastNums.begin())) {//3.2.2 调整红黑树  
+                
+                    leastNums.erase(iterGreatest);
+                    leastNums.insert(*iter);
+                }
+            }
+        }
+ 
+        return vector<int> (leastNums.begin(), leastNums.end());
+    }
+};
+
+```
+
+```
+multiset<int, greater<int>> greadterSet;//红黑树 内置类型从大到小~
+multiset<int, less<int>> lessSet;//红黑树 内置类型从小到大~
+
+```
+
+需要背的单词：
+
+-   erase
+-   multiset
+-   iterator
+-   greater
+-   if(_iter<_(leastnum.begin()))这里要注意迭代器iterator取到的都是指针
+
+#### 方法2：[](https://aydove.github.io/2019/04/23/40-%E6%9C%80%E5%B0%8F%E7%9A%84k%E4%B8%AA%E6%95%B0/#%E6%96%B9%E6%B3%952)
+
+**Partiton思想 时间复杂度O(n)**
+
+```objk
+class Solution {
+public:
+    int Partition(vector<int>& input, int begin, int end)
+    {
+        int low=begin;
+        int high=end;
+         
+        int pivot=input[low];
+        while(low<high)
+        {
+            while(low<high&&pivot<=input[high])
+                high--;
+            input[low]=input[high];
+            while(low<high&&pivot>=input[low])
+                low++;
+            input[high]=input[low];
+        }
+        input[low]=pivot;
+        return low;
+    }
+     
+    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
+         
+        int len=input.size();
+        if(len==0||k>len||k<=0) return vector<int>();
+        if(len==k) return input;
+         
+        int start=0;
+        int end=len-1;
+        int index=Partition(input,start,end);
+        while(index!=(k-1))
+        {
+            if(index>k-1)
+            {
+                end=index-1;
+                index=Partition(input,start,end);
+            }
+            else
+            {
+                start=index+1;
+                index=Partition(input,start,end);
+            }
+        }
+         
+        vector<int> res(input.begin(), input.begin() + k);
+         
+        return res;
+    }
+ 
+};
+
+```
+
+### 参考[](https://aydove.github.io/2019/04/23/40-%E6%9C%80%E5%B0%8F%E7%9A%84k%E4%B8%AA%E6%95%B0/#%E5%8F%82%E8%80%83)
+
+-   [参考1](https://github.com/zhedahht/CodingInterviewChinese2)
+-   [参考2](https://github.com/gatieme/CodingInterviews)
+-   [hahahaha](https://www.nowcoder.com/practice/6a296eb82cf844ca8539b57c23e6e9bf?tpId=13&tqId=11182&tPage=2&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
+
+> Written with  [StackEdit](https://stackedit.io/).
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTEwNzQ5Mjk1OV19
+-->
